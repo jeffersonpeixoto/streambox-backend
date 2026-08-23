@@ -1,0 +1,706 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <meta
+    name="theme-color"
+    content="#050505">
+
+  <meta
+    name="description"
+    content="StreamBox TV">
+
+  <link
+    rel="manifest"
+    href="manifest.webmanifest">
+
+  <link
+    rel="icon"
+    href="icons/icon.svg">
+
+  <link
+    rel="stylesheet"
+    href="styles.css">
+
+  <title>StreamBox TV</title>
+
+</head>
+
+
+<body>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================= -->
+
+  <header class="topbar">
+
+    <div class="brand">
+
+      <span class="brand-icon">
+        ▶
+      </span>
+
+      <span class="brand-name">
+        StreamBox
+      </span>
+
+      <small>
+        TV
+      </small>
+
+    </div>
+
+
+    <nav class="main-nav">
+
+      <button
+        class="nav-btn active"
+        data-section="live"
+        tabindex="0">
+
+        TV AO VIVO
+
+      </button>
+
+
+      <button
+        class="nav-btn"
+        data-section="vod"
+        tabindex="0">
+
+        FILMES
+
+      </button>
+
+
+      <button
+        class="nav-btn"
+        data-section="series"
+        tabindex="0">
+
+        SÉRIES
+
+      </button>
+
+    </nav>
+
+
+    <div class="top-actions">
+
+      <button
+        id="searchBtn"
+        class="top-action"
+        aria-label="Pesquisar"
+        tabindex="0">
+
+        🔍
+
+      </button>
+
+
+      <button
+        id="settingsBtn"
+        class="top-action"
+        aria-label="Configurações"
+        tabindex="0">
+
+        ⚙
+
+      </button>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- =========================================================
+       SEARCH
+  ========================================================= -->
+
+  <section
+    id="searchPanel"
+    class="search-panel">
+
+    <input
+      id="search"
+      type="search"
+      placeholder="Buscar filmes, séries e canais..."
+      autocomplete="off">
+
+  </section>
+
+
+
+  <!-- =========================================================
+       PLAYER
+       
+       O player fica preparado para:
+       - TV ao vivo
+       - Filmes
+       - Episódios
+       - Fullscreen
+  ========================================================= -->
+
+  <section
+    id="player"
+    class="player hidden">
+
+    <video
+      id="video"
+      controls
+      playsinline
+      preload="metadata">
+    </video>
+
+
+    <!-- =======================================================
+         PLAYER EMPTY
+    ======================================================= -->
+
+    <div
+      id="playerEmpty"
+      class="player-empty">
+
+      <div class="player-icon">
+        ▶
+      </div>
+
+      <strong>
+        Selecione um conteúdo
+      </strong>
+
+      <span>
+        Escolha um filme, série ou canal para começar
+      </span>
+
+    </div>
+
+
+    <!-- =======================================================
+         NOW PLAYING
+    ======================================================= -->
+
+    <div
+      id="nowPlaying"
+      class="now-playing hidden">
+    </div>
+
+
+    <!-- =======================================================
+         PLAYER TITLE
+    ======================================================= -->
+
+    <div
+      id="playerTitle"
+      class="player-title">
+    </div>
+
+
+    <!-- =======================================================
+         PLAYER CONTROLS
+         
+         Usados pelo controle remoto / navegador.
+    ======================================================= -->
+
+    <div
+      class="player-controls"
+      aria-label="Controles do player">
+
+      <button
+        id="playerPlayPause"
+        class="player-control"
+        aria-label="Reproduzir ou pausar">
+
+        ▶
+
+      </button>
+
+
+      <button
+        id="playerMute"
+        class="player-control"
+        aria-label="Ativar ou desativar som">
+
+        🔊
+
+      </button>
+
+
+      <button
+        id="playerFullscreen"
+        class="player-control"
+        aria-label="Tela cheia">
+
+        ⛶
+
+      </button>
+
+
+      <button
+        id="playerClose"
+        class="player-control"
+        aria-label="Fechar player">
+
+        ✕
+
+      </button>
+
+    </div>
+
+
+
+  </section>
+
+
+
+  <!-- =========================================================
+       HERO
+  ========================================================= -->
+
+  <section
+    id="hero"
+    class="hero">
+
+    <div
+      class="hero-backdrop">
+    </div>
+
+
+    <div
+      class="hero-content">
+
+      <div
+        class="hero-badge">
+
+        STREAMBOX
+
+      </div>
+
+
+      <h1 id="heroTitle">
+
+        Bem-vindo ao StreamBox
+
+      </h1>
+
+
+      <div
+        id="heroMeta"
+        class="hero-meta">
+
+        Filmes • Séries • TV
+
+      </div>
+
+
+      <p id="heroDescription">
+
+        Milhares de conteúdos disponíveis para você assistir.
+
+      </p>
+
+
+      <div
+        class="hero-actions">
+
+        <button
+          id="heroPlay"
+          class="hero-play">
+
+          ▶ ASSISTIR
+
+        </button>
+
+
+        <button
+          id="heroInfo"
+          class="hero-info">
+
+          ⓘ MAIS INFORMAÇÕES
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================================================
+       CONTEÚDO PRINCIPAL
+  ========================================================= -->
+
+  <main id="content">
+
+    <!-- =======================================================
+         TÍTULO DA SEÇÃO
+    ======================================================= -->
+
+    <div
+      id="heading"
+      class="section-heading">
+
+      <h1 id="title">
+        TV AO VIVO
+      </h1>
+
+      <span id="count">
+      </span>
+
+    </div>
+
+
+
+    <!-- =======================================================
+         CATEGORIAS
+    ======================================================= -->
+
+    <section
+      id="categoriesSection"
+      class="category-section">
+
+      <div
+        id="categories"
+        class="category-list">
+      </div>
+
+    </section>
+
+
+
+    <!-- =======================================================
+         CARROSSÉIS
+    ======================================================= -->
+
+    <section
+      id="rows"
+      class="rows">
+    </section>
+
+
+
+    <!-- =======================================================
+         RESULTADOS
+    ======================================================= -->
+
+    <section
+      id="searchResults"
+      class="search-results">
+
+      <div
+        class="row-title">
+
+        <h2>
+          Conteúdo
+        </h2>
+
+      </div>
+
+
+      <div
+        id="items"
+        class="movie-grid">
+      </div>
+
+
+      <div
+        id="pagination"
+        class="pagination">
+      </div>
+
+
+      <div
+        id="empty"
+        class="empty hidden">
+
+        Nenhum conteúdo encontrado.
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+
+  <!-- =========================================================
+       DETALHES DA SÉRIE
+       
+       Fluxo:
+       
+       Série
+          ↓
+       Temporadas
+          ↓
+       Episódios
+          ↓
+       Player
+  ========================================================= -->
+
+  <section
+    id="seriesDetail"
+    class="series-detail hidden">
+
+    <!-- =======================================================
+         BACKDROP
+    ======================================================= -->
+
+    <div
+      class="series-detail-backdrop">
+    </div>
+
+
+    <div
+      class="series-detail-content">
+
+      <!-- =====================================================
+           VOLTAR
+      ===================================================== -->
+
+      <button
+        id="seriesBack"
+        class="series-back"
+        tabindex="0">
+
+        ← VOLTAR
+
+      </button>
+
+
+
+      <!-- =====================================================
+           INFORMAÇÕES DA SÉRIE
+      ===================================================== -->
+
+      <div
+        class="series-info">
+
+
+        <!-- CAPA -->
+
+        <div
+          class="series-cover">
+
+          <img
+            id="seriesCover"
+            src=""
+            alt="">
+
+        </div>
+
+
+
+        <!-- INFORMAÇÕES -->
+
+        <div
+          class="series-description">
+
+          <h1
+            id="seriesTitle">
+
+            Série
+
+          </h1>
+
+
+          <div
+            id="seriesMeta"
+            class="series-meta">
+          </div>
+
+
+          <p
+            id="seriesPlot">
+          </p>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           TEMPORADAS
+      ===================================================== -->
+
+      <div
+        class="seasons-header">
+
+        <h2>
+          TEMPORADAS
+        </h2>
+
+
+        <select
+          id="seasonSelect"
+          tabindex="0"
+          aria-label="Selecionar temporada">
+
+        </select>
+
+      </div>
+
+
+
+      <!-- =====================================================
+           EPISÓDIOS
+      ===================================================== -->
+
+      <div
+        class="episodes-header">
+
+        <h2>
+          EPISÓDIOS
+        </h2>
+
+      </div>
+
+
+      <div
+        id="episodes"
+        class="episodes-list">
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================================================
+       CONFIGURAÇÕES
+  ========================================================= -->
+
+  <dialog id="settings">
+
+    <div
+      class="dialog-head">
+
+      <h2>
+        Configuração IPTV
+      </h2>
+
+
+      <button
+        id="close"
+        class="icon-btn"
+        aria-label="Fechar">
+
+        ✕
+
+      </button>
+
+    </div>
+
+
+
+    <label for="server">
+      Servidor
+    </label>
+
+    <input
+      id="server"
+      placeholder="http://servidor:8080"
+      autocomplete="url">
+
+
+
+    <label for="username">
+      Usuário
+    </label>
+
+    <input
+      id="username"
+      autocomplete="username">
+
+
+
+    <label for="password">
+      Senha
+    </label>
+
+    <input
+      id="password"
+      type="password"
+      autocomplete="current-password">
+
+
+
+    <p>
+
+      As credenciais ficam salvas apenas neste dispositivo.
+      O StreamBox consulta o provedor através do backend.
+
+    </p>
+
+
+
+    <button
+      id="connect"
+      class="primary">
+
+      CONECTAR E SALVAR
+
+    </button>
+
+
+
+    <button
+      id="forget"
+      class="danger">
+
+      REMOVER CREDENCIAIS
+
+    </button>
+
+  </dialog>
+
+
+
+  <!-- =========================================================
+       STATUS
+  ========================================================= -->
+
+  <div
+    id="status"
+    class="status">
+
+    Desconectado
+
+  </div>
+
+
+
+  <!-- =========================================================
+       HLS.JS
+  ========================================================= -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/hls.js@latest">
+  </script>
+
+
+
+  <!-- =========================================================
+       APP
+  ========================================================= -->
+
+  <script
+    src="app.js">
+  </script>
+
+
+</body>
+
+</html>

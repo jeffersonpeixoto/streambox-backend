@@ -1,0 +1,1832 @@
+/* =========================================================
+   STREAMBOX TV
+   Streaming UI — dark / cinematic / TV friendly
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #050505;
+  --bg-soft: #0b0b0b;
+  --panel: #111111;
+  --panel-2: #181818;
+  --text: #ffffff;
+  --muted: #a6a6a6;
+  --accent: #e50914;
+  --accent-dark: #b20710;
+  --border: rgba(255,255,255,.10);
+  --focus: #ffffff;
+}
+
+html {
+  background: var(--bg);
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      circle at 75% 10%,
+      rgba(229,9,20,.08),
+      transparent 28%
+    ),
+    var(--bg);
+
+  color: var(--text);
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  overflow-x: hidden;
+}
+
+
+/* =========================================================
+   SCROLLBAR
+========================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #080808;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 1000;
+
+  height: 72px;
+
+  display: flex;
+  align-items: center;
+
+  padding:
+    0 42px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0,0,0,.98),
+      rgba(0,0,0,.88),
+      transparent
+    );
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.brand {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  white-space: nowrap;
+}
+
+.brand-icon {
+  width: 30px;
+  height: 30px;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--accent);
+
+  border-radius: 6px;
+
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.brand-name {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.brand small {
+  color: #999;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  margin-left: -5px;
+  margin-top: 12px;
+}
+
+
+/* =========================================================
+   NAV
+========================================================= */
+
+.main-nav {
+  display: flex;
+
+  align-items: center;
+
+  gap: 26px;
+
+  margin-left: 55px;
+}
+
+.nav-btn {
+  border: 0;
+  background: transparent;
+
+  color: #bdbdbd;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  padding: 25px 0;
+
+  transition:
+    color .2s,
+    transform .2s;
+}
+
+.nav-btn:hover,
+.nav-btn.active {
+  color: #fff;
+}
+
+.nav-btn.active {
+  position: relative;
+}
+
+.nav-btn.active::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 15px;
+
+  height: 3px;
+
+  background: var(--accent);
+
+  border-radius: 4px;
+}
+
+
+/* =========================================================
+   TOP ACTIONS
+========================================================= */
+
+.top-actions {
+  margin-left: auto;
+
+  display: flex;
+
+  gap: 12px;
+}
+
+.top-action {
+  width: 42px;
+  height: 42px;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,.08);
+
+  color: #fff;
+
+  font-size: 18px;
+
+  cursor: pointer;
+
+  transition:
+    background .2s,
+    transform .2s;
+}
+
+.top-action:hover {
+  background: rgba(255,255,255,.16);
+}
+
+.top-action:focus-visible {
+  outline: 3px solid #fff;
+
+  transform: scale(1.08);
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.search-panel {
+  position: fixed;
+
+  top: 72px;
+  right: 42px;
+
+  z-index: 999;
+
+  width: 0;
+
+  opacity: 0;
+
+  overflow: hidden;
+
+  transition:
+    width .25s,
+    opacity .2s;
+}
+
+.search-panel.open {
+  width: 380px;
+
+  opacity: 1;
+}
+
+.search-panel input {
+  width: 100%;
+
+  height: 48px;
+
+  padding: 0 18px;
+
+  border:
+    1px solid rgba(255,255,255,.25);
+
+  border-radius: 6px;
+
+  background: rgba(15,15,15,.97);
+
+  color: #fff;
+
+  font-size: 15px;
+
+  outline: none;
+}
+
+.search-panel input:focus {
+  border-color: #fff;
+}
+
+
+/* =========================================================
+   PLAYER
+========================================================= */
+
+.player {
+  position: relative;
+
+  width: 100%;
+
+  background: #000;
+
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+.player video {
+  display: block;
+
+  width: 100%;
+
+  max-height: 70vh;
+
+  background: #000;
+}
+
+.player-empty {
+  display: none;
+}
+
+.now-playing {
+  position: absolute;
+
+  left: 30px;
+  bottom: 65px;
+
+  padding: 10px 16px;
+
+  border-radius: 5px;
+
+  background: rgba(0,0,0,.75);
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.hidden {
+  display: none !important;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+  position: relative;
+
+  min-height: 620px;
+
+  margin-top: 0;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  overflow: hidden;
+}
+
+.hero-backdrop {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      #050505 0%,
+      rgba(5,5,5,.95) 25%,
+      rgba(5,5,5,.45) 65%,
+      rgba(5,5,5,.1) 100%
+    ),
+    linear-gradient(
+      0deg,
+      #050505 0%,
+      transparent 65%
+    );
+
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  transform: scale(1.02);
+
+  transition:
+    background-image .4s ease;
+}
+
+.hero-content {
+  position: relative;
+
+  z-index: 2;
+
+  width: min(650px, 60%);
+
+  margin-left: 55px;
+
+  padding-bottom: 90px;
+}
+
+.hero-badge {
+  display: inline-block;
+
+  margin-bottom: 15px;
+
+  color: #ddd;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  letter-spacing: 3px;
+}
+
+.hero h1 {
+  margin: 0 0 15px;
+
+  font-size: clamp(
+    38px,
+    5vw,
+    70px
+  );
+
+  line-height: .98;
+
+  letter-spacing: -2px;
+}
+
+.hero-meta {
+  margin-bottom: 15px;
+
+  color: #ddd;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.hero p {
+  max-width: 540px;
+
+  margin: 0 0 25px;
+
+  color: #c8c8c8;
+
+  font-size: 16px;
+
+  line-height: 1.5;
+}
+
+.hero-actions {
+  display: flex;
+
+  gap: 12px;
+}
+
+.hero-play,
+.hero-info {
+  min-height: 46px;
+
+  padding:
+    0 24px;
+
+  border: 0;
+
+  border-radius: 5px;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition:
+    transform .2s,
+    background .2s;
+}
+
+.hero-play {
+  background: #fff;
+
+  color: #000;
+}
+
+.hero-info {
+  background: rgba(100,100,100,.65);
+
+  color: #fff;
+}
+
+.hero-play:hover,
+.hero-info:hover {
+  transform: scale(1.04);
+}
+
+.hero-play:focus-visible,
+.hero-info:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+main {
+  position: relative;
+
+  z-index: 5;
+
+  margin-top: -70px;
+
+  padding-bottom: 80px;
+}
+
+.section-heading {
+  display: flex;
+
+  align-items: baseline;
+
+  gap: 15px;
+
+  padding:
+    0 55px;
+
+  margin-bottom: 22px;
+}
+
+.section-heading h1 {
+  margin: 0;
+
+  font-size: 26px;
+}
+
+.section-heading span {
+  color: #888;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   CATEGORIES
+========================================================= */
+
+.category-section {
+  padding:
+    0 55px;
+
+  margin-bottom: 32px;
+
+  overflow-x: auto;
+}
+
+.category-list {
+  display: flex;
+
+  gap: 10px;
+
+  width: max-content;
+}
+
+.category-pill {
+  border: 1px solid var(--border);
+
+  background: rgba(255,255,255,.06);
+
+  color: #ddd;
+
+  padding:
+    10px 16px;
+
+  border-radius: 22px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background .2s,
+    color .2s,
+    transform .2s;
+}
+
+.category-pill span {
+  margin-right: 5px;
+}
+
+.category-pill:hover {
+  background: rgba(255,255,255,.14);
+
+  color: #fff;
+}
+
+.category-pill:focus-visible {
+  outline: 3px solid #fff;
+
+  outline-offset: 3px;
+
+  transform: scale(1.05);
+}
+
+
+/* =========================================================
+   CONTENT ROW
+========================================================= */
+
+.content-row {
+  margin-bottom: 38px;
+}
+
+.row-title {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding:
+    0 55px;
+
+  margin-bottom: 12px;
+}
+
+.row-title h2 {
+  margin: 0;
+
+  font-size: 20px;
+
+  font-weight: 800;
+
+  letter-spacing: -.3px;
+}
+
+.see-all {
+  border: 0;
+
+  background: transparent;
+
+  color: #aaa;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.see-all:hover {
+  color: #fff;
+}
+
+
+/* =========================================================
+   CARROSSEL
+========================================================= */
+
+.row-track {
+  display: flex;
+
+  gap: 12px;
+
+  padding:
+    8px 55px 18px;
+
+  overflow-x: auto;
+
+  scroll-behavior: smooth;
+
+  scrollbar-width: none;
+}
+
+.row-track::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* =========================================================
+   MOVIE CARD
+========================================================= */
+
+.movie-card {
+  position: relative;
+
+  flex: 0 0 180px;
+
+  width: 180px;
+
+  cursor: pointer;
+
+  border-radius: 5px;
+
+  overflow: visible;
+
+  transition:
+    transform .25s ease,
+    z-index .25s;
+}
+
+.movie-poster {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 2 / 3;
+
+  overflow: hidden;
+
+  border-radius: 5px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #171717,
+      #303030
+    );
+
+  box-shadow:
+    0 8px 20px rgba(0,0,0,.45);
+}
+
+.movie-poster img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  transition:
+    transform .3s ease;
+}
+
+.movie-card:hover {
+  transform:
+    scale(1.08)
+    translateY(-5px);
+
+  z-index: 20;
+}
+
+.movie-card:hover
+.movie-poster img {
+  transform: scale(1.04);
+}
+
+.movie-card:focus {
+  outline: none;
+
+  transform:
+    scale(1.08)
+    translateY(-5px);
+
+  z-index: 30;
+}
+
+.movie-card:focus
+.movie-poster {
+  box-shadow:
+    0 0 0 3px #fff,
+    0 12px 30px rgba(0,0,0,.7);
+}
+
+.movie-card:focus
+.movie-poster img {
+  transform: scale(1.04);
+}
+
+.movie-name {
+  margin-top: 9px;
+
+  color: #e5e5e5;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  line-height: 1.25;
+
+  overflow: hidden;
+
+  display: -webkit-box;
+
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.poster-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+
+  place-items: center;
+
+  color: #555;
+
+  font-size: 35px;
+}
+
+
+/* =========================================================
+   SEARCH RESULTS
+========================================================= */
+
+.search-results {
+  padding-bottom: 60px;
+}
+
+.movie-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(180px, 1fr)
+    );
+
+  gap: 30px 14px;
+
+  padding:
+    0 55px;
+}
+
+.movie-grid
+.movie-card {
+  width: auto;
+
+  flex: none;
+}
+
+
+/* =========================================================
+   PAGINATION
+========================================================= */
+
+.pagination {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 24px;
+
+  padding:
+    35px 20px;
+}
+
+.pagination button {
+  border: 0;
+
+  border-radius: 5px;
+
+  padding:
+    12px 20px;
+
+  background: #222;
+
+  color: #fff;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.pagination button:hover {
+  background: #333;
+}
+
+.pagination button:disabled {
+  opacity: .35;
+
+  cursor: default;
+}
+
+.pagination span {
+  color: #999;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.empty {
+  padding: 80px 20px;
+
+  text-align: center;
+
+  color: #777;
+
+  font-size: 16px;
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+dialog {
+  width: min(
+    450px,
+    calc(100vw - 30px)
+  );
+
+  border: 1px solid rgba(255,255,255,.12);
+
+  border-radius: 10px;
+
+  padding: 28px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #181818,
+      #0b0b0b
+    );
+
+  color: #fff;
+
+  box-shadow:
+    0 30px 100px rgba(0,0,0,.8);
+}
+
+dialog::backdrop {
+  background:
+    rgba(0,0,0,.78);
+}
+
+.dialog-head {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 25px;
+}
+
+.dialog-head h2 {
+  margin: 0;
+
+  font-size: 22px;
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,.08);
+
+  color: #fff;
+
+  cursor: pointer;
+}
+
+dialog label {
+  display: block;
+
+  margin:
+    16px 0 7px;
+
+  color: #bbb;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+dialog input {
+  width: 100%;
+
+  height: 45px;
+
+  padding:
+    0 13px;
+
+  border:
+    1px solid #333;
+
+  border-radius: 5px;
+
+  background: #090909;
+
+  color: #fff;
+
+  outline: none;
+}
+
+dialog input:focus {
+  border-color: #fff;
+}
+
+dialog p {
+  color: #888;
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+.primary,
+.danger {
+  width: 100%;
+
+  height: 45px;
+
+  margin-top: 10px;
+
+  border: 0;
+
+  border-radius: 5px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.primary {
+  background: var(--accent);
+
+  color: #fff;
+}
+
+.primary:hover {
+  background: var(--accent-dark);
+}
+
+.danger {
+  background: #222;
+
+  color: #ddd;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status {
+  position: fixed;
+
+  right: 20px;
+  bottom: 18px;
+
+  z-index: 2000;
+
+  padding:
+    7px 12px;
+
+  border-radius: 4px;
+
+  background:
+    rgba(0,0,0,.7);
+
+  color: #80d99e;
+
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   RESPONSIVO
+========================================================= */
+
+@media (
+  max-width: 900px
+) {
+
+  .topbar {
+    padding: 0 22px;
+  }
+
+  .main-nav {
+    margin-left: 25px;
+
+    gap: 15px;
+  }
+
+  .nav-btn {
+    font-size: 12px;
+  }
+
+  .hero-content {
+    margin-left: 30px;
+
+    width: 70%;
+  }
+
+  .row-title,
+  .section-heading {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .row-track {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .category-section {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+
+  .movie-grid {
+    padding:
+      0 30px;
+  }
+
+}
+
+
+@media (
+  max-width: 650px
+) {
+
+  .brand-name {
+    font-size: 20px;
+  }
+
+  .main-nav {
+    display: none;
+  }
+
+  .hero {
+    min-height: 500px;
+  }
+
+  .hero-content {
+    width: 85%;
+
+    margin-left: 22px;
+
+    padding-bottom: 70px;
+  }
+
+  .hero h1 {
+    font-size: 38px;
+  }
+
+  .hero p {
+    font-size: 14px;
+  }
+
+  .hero-info {
+    display: none;
+  }
+
+  .movie-card {
+    flex-basis: 145px;
+
+    width: 145px;
+  }
+
+  .movie-grid {
+    grid-template-columns:
+      repeat(
+        3,
+        minmax(0, 1fr)
+      );
+  }
+
+}
+
+.cat {
+  border: 1px solid var(--border);
+
+  background: rgba(255,255,255,.06);
+
+  color: #ddd;
+
+  padding: 10px 16px;
+
+  border-radius: 22px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background .2s,
+    color .2s,
+    transform .2s;
+}
+/* =========================================================
+   PLAYER — STREAMBOX TV
+========================================================= */
+
+.player {
+  position: relative;
+
+  width: 100%;
+
+  margin-top: 72px;
+
+  background: #000;
+
+  aspect-ratio: 16 / 9;
+
+  max-height: calc(100vh - 72px);
+
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 10;
+}
+
+.player video {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  background: #000;
+}
+
+.player-empty {
+  position: absolute;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(
+      circle at center,
+      #151515 0%,
+      #050505 65%
+    );
+
+  color: #555;
+
+  font-size: 18px;
+}
+
+.now-playing {
+  position: absolute;
+
+  left: 30px;
+  bottom: 30px;
+
+  z-index: 20;
+
+  max-width: 60%;
+
+  padding:
+    10px 16px;
+
+  border-radius: 5px;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.9),
+      rgba(0,0,0,.55)
+    );
+
+  color: #fff;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  backdrop-filter: blur(5px);
+}
+
+.player::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 100px;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      0deg,
+      rgba(0,0,0,.65),
+      transparent
+    );
+}
+
+
+/* =========================================================
+   PLAYER EM TELAS GRANDES
+========================================================= */
+
+@media (min-width: 1200px) {
+
+  .player {
+    aspect-ratio: auto;
+
+    height: 68vh;
+
+    min-height: 500px;
+
+    max-height: 760px;
+  }
+
+}
+
+
+/* =========================================================
+   PLAYER TV / GOOGLE TV
+========================================================= */
+
+@media (min-width: 1600px) {
+
+  .player {
+    height: 72vh;
+
+    max-height: 820px;
+  }
+
+}
+
+
+/* =========================================================
+   CELULAR
+========================================================= */
+
+@media (max-width: 650px) {
+
+  .player {
+
+    margin-top: 60px;
+
+    aspect-ratio: 16 / 9;
+
+    max-height: none;
+
+  }
+
+  .now-playing {
+
+    left: 15px;
+    bottom: 15px;
+
+    max-width: 80%;
+
+    font-size: 13px;
+
+  }
+
+}
+.cat:hover,
+.cat.active {
+  background: rgba(255,255,255,.14);
+  color: #fff;
+}
+
+.cat:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+  transform: scale(1.05);
+}
+
+.cat.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+/* =========================================================
+   TV / CONTROLE REMOTO
+========================================================= */
+
+@media (
+  min-width: 1000px
+) {
+
+  button,
+  .movie-card,
+  input {
+    -webkit-tap-highlight-color:
+      transparent;
+  }
+
+  button:focus-visible,
+  .movie-card:focus-visible {
+    outline:
+      3px solid #fff;
+
+    outline-offset: 4px;
+  }
+
+}
+/* =========================================================
+   STREAMBOX — PLAYER FULLSCREEN
+========================================================= */
+
+.player-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 99999;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100vw;
+  height: 100vh;
+
+  min-height: 100vh;
+
+  margin: 0;
+  padding: 0;
+
+  background: #000;
+
+  opacity: 1;
+
+  visibility: visible;
+
+  transition:
+    opacity .25s ease,
+    visibility .25s ease;
+}
+
+
+/* Quando escondido */
+
+.player-overlay.hidden {
+  display: none !important;
+}
+
+
+/* =========================================================
+   VÍDEO
+========================================================= */
+
+.player-overlay video {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  max-height: none;
+
+  object-fit: contain;
+
+  background: #000;
+}
+
+
+/* =========================================================
+   PLAYER EM FULLSCREEN REAL
+========================================================= */
+
+.player-overlay:fullscreen {
+  width: 100vw;
+  height: 100vh;
+
+  background: #000;
+}
+
+
+/* Firefox */
+
+.player-overlay:-moz-full-screen {
+  width: 100vw;
+  height: 100vh;
+
+  background: #000;
+}
+
+
+/* =========================================================
+   FALLBACK FULLSCREEN
+========================================================= */
+
+.player-overlay.fullscreen-fallback {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  z-index: 99999;
+}
+
+
+/* =========================================================
+   VAZIO / LOADING
+========================================================= */
+
+.player-overlay .player-empty {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 2;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-direction: column;
+
+  gap: 12px;
+
+  background: #000;
+
+  color: #fff;
+
+  pointer-events: none;
+}
+
+.player-overlay .player-empty.hidden {
+  display: none !important;
+}
+
+.player-icon {
+  width: 64px;
+  height: 64px;
+
+  display: grid;
+
+  place-items: center;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,.10);
+
+  font-size: 24px;
+}
+
+
+/* =========================================================
+   NOME DO CANAL
+========================================================= */
+
+.player-overlay .now-playing {
+  position: absolute;
+
+  left: 35px;
+  bottom: 100px;
+
+  z-index: 10;
+
+  padding: 10px 16px;
+
+  border-radius: 5px;
+
+  background: rgba(0,0,0,.72);
+
+  color: #fff;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  pointer-events: none;
+
+  transition:
+    opacity .25s ease;
+}
+
+
+/* =========================================================
+   FECHAR
+========================================================= */
+
+.player-close {
+  position: absolute;
+
+  top: 25px;
+  right: 30px;
+
+  z-index: 30;
+
+  width: 46px;
+  height: 46px;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background: rgba(0,0,0,.65);
+
+  color: #fff;
+
+  font-size: 20px;
+
+  cursor: pointer;
+
+  opacity: 0;
+
+  transition:
+    opacity .2s,
+    background .2s,
+    transform .2s;
+}
+
+.player-overlay:hover .player-close,
+.player-overlay.controls-visible .player-close {
+  opacity: 1;
+}
+
+.player-close:hover {
+  background: rgba(255,255,255,.18);
+
+  transform: scale(1.08);
+}
+
+.player-close:focus-visible {
+  opacity: 1;
+
+  outline: 3px solid #fff;
+
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   CONTROLES
+========================================================= */
+
+.player-controls {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  z-index: 20;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  min-height: 76px;
+
+  padding:
+    20px 30px;
+
+  background:
+    linear-gradient(
+      0deg,
+      rgba(0,0,0,.95),
+      rgba(0,0,0,.65),
+      transparent
+    );
+
+  opacity: 0;
+
+  transform: translateY(10px);
+
+  pointer-events: none;
+
+  transition:
+    opacity .25s ease,
+    transform .25s ease;
+}
+
+
+/* Mostrar controles */
+
+.player-overlay.controls-visible
+.player-controls {
+
+  opacity: 1;
+
+  transform: translateY(0);
+
+  pointer-events: auto;
+
+}
+
+
+/* =========================================================
+   BOTÕES DO PLAYER
+========================================================= */
+
+.player-control {
+
+  width: 46px;
+  height: 46px;
+
+  flex: 0 0 auto;
+
+  border: 0;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,.10);
+
+  color: #fff;
+
+  font-size: 18px;
+
+  cursor: pointer;
+
+  transition:
+    background .2s,
+    transform .2s;
+}
+
+.player-control:hover {
+  background: rgba(255,255,255,.20);
+
+  transform: scale(1.06);
+}
+
+.player-control:focus-visible {
+  outline: 3px solid #fff;
+
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   TÍTULO
+========================================================= */
+
+.player-title {
+  flex: 1;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  white-space: nowrap;
+
+  text-overflow: ellipsis;
+
+  color: #fff;
+
+  font-size: 15px;
+
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   PLAYER ATIVO
+========================================================= */
+
+.player-overlay.playing
+.player-empty {
+
+  display: none;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+  .player-controls {
+
+    min-height: 65px;
+
+    padding:
+      12px 15px;
+
+    gap: 8px;
+
+  }
+
+  .player-control {
+
+    width: 40px;
+    height: 40px;
+
+    font-size: 15px;
+
+  }
+
+  .player-close {
+
+    top: 15px;
+    right: 15px;
+
+  }
+
+  .player-overlay .now-playing {
+
+    left: 15px;
+    bottom: 80px;
+
+    font-size: 14px;
+
+  }
+
+}

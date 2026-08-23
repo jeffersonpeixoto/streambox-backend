@@ -1,0 +1,16 @@
+{
+  "name": "streambox-functions",
+  "description": "StreamBox IPTV Backend",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-functions": "^7.0.0",
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "compression": "^1.8.1"
+  }
+}
