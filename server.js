@@ -1253,4 +1253,12 @@ function createProxyUrl(
    START
 ========================================================= */
 
+/* =========================================================
+   START DO SERVIDOR
+========================================================= */
+
+app.listen(PORT, () => {
+  console.log(`StreamBox TV backend rodando na porta ${PORT}`);
+});
+
 export { app };
