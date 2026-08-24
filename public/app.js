@@ -3376,6 +3376,49 @@ async function playItem(
    HLS LIVE
 ========================================================= */
 
+/*
+ * =========================================================
+ * HLS.js — CARREGAMENTO SOB DEMANDA
+ *
+ * Antes, o hls.js (~100-150KB) era baixado sempre que a página
+ * abria, mesmo que o usuário só fosse navegar pelo menu. Agora
+ * só baixa na primeira vez que algo é realmente reproduzido.
+ * =========================================================
+ */
+
+let _hlsLoadPromise = null;
+
+function loadHlsLib() {
+
+  if (typeof Hls !== "undefined") {
+    return Promise.resolve();
+  }
+
+  if (_hlsLoadPromise) {
+    return _hlsLoadPromise;
+  }
+
+  _hlsLoadPromise = new Promise((resolve, reject) => {
+
+    const script = document.createElement("script");
+
+    script.src = "https://cdn.jsdelivr.net/npm/hls.js@latest";
+
+    script.onload = () => resolve();
+
+    script.onerror = () => reject(
+      new Error("Falha ao carregar hls.js")
+    );
+
+    document.head.appendChild(script);
+
+  });
+
+  return _hlsLoadPromise;
+
+}
+
+
 async function playLive(
   video,
   url
@@ -3439,8 +3482,22 @@ async function playLive(
 
 
   /*
-   * HLS.js.
+   * HLS.js — carregado sob demanda aqui, na primeira reprodução.
    */
+
+  try {
+
+    await loadHlsLib();
+
+  } catch (error) {
+
+    console.warn(
+      "[PLAYER] Não foi possível carregar hls.js",
+      error
+    );
+
+  }
+
 
   if (
     typeof Hls !==

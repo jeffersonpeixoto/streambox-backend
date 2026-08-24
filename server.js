@@ -8,6 +8,15 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const appOrigin = process.env.APP_ORIGIN || "*";
 
+// Log de depuração desligado por padrão — o proxy de stream é chamado a cada
+// segmento de vídeo (dezenas de vezes por minuto), então logar sempre pesa
+// desnecessariamente. Ative com a variável de ambiente DEBUG=true no Render
+// se precisar investigar algo.
+const DEBUG = process.env.DEBUG === "true";
+function debugLog(...args) {
+  if (DEBUG) console.log(...args);
+}
+
 app.use(
   cors({
     origin: appOrigin === "*" ? true : appOrigin
@@ -39,7 +48,18 @@ app.use(
   })
 );
 
-app.use(express.static("public", { dotfiles: "allow" }));
+app.use(express.static("public", {
+  dotfiles: "allow",
+  // index.html precisa ser sempre revalidado (pode mudar); os demais arquivos
+  // (css, js, ícones) ganham cache de 1 dia no navegador, reduzindo downloads
+  // repetidos sem risco de servir algo desatualizado por muito tempo.
+  maxAge: "1d",
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith("index.html")) {
+      res.setHeader("Cache-Control", "no-cache");
+    }
+  }
+}));
 
 
 /* =========================================================
@@ -628,7 +648,7 @@ app.post(
         String(categoryId) === "principal"
       ) {
 
-        console.log(
+        debugLog(
           "[TV PRINCIPAIS] Buscando canais..."
         );
 
@@ -646,7 +666,7 @@ app.post(
             : [];
 
 
-        console.log(
+        debugLog(
           `[TV PRINCIPAIS] ${channels.length} canais encontrados`
         );
 
@@ -672,13 +692,13 @@ app.post(
               canal
             );
 
-            console.log(
+            debugLog(
               `[PRINCIPAL] ${grupo.titulo} -> ${canal.name}`
             );
 
           } else {
 
-            console.log(
+            debugLog(
               `[PRINCIPAL] ${grupo.titulo} -> NÃO ENCONTRADO`
             );
 
@@ -686,7 +706,7 @@ app.post(
         }
 
 
-        console.log(
+        debugLog(
           `[TV PRINCIPAIS] ${resultado.length} canais selecionados`
         );
 
@@ -838,9 +858,9 @@ app.get("/proxy/stream", async (req, res) => {
     const server = cleanServer(req.query.server);
     const path = String(req.query.path || "");
 
-    console.log("[PROXY] Requisição recebida");
-    console.log("[PROXY] Server:", server);
-    console.log("[PROXY] Path:", path);
+    debugLog("[PROXY] Requisição recebida");
+    debugLog("[PROXY] Server:", server);
+    debugLog("[PROXY] Path:", path);
 
     if (
       !/^https?:\/\//i.test(server) ||
@@ -860,7 +880,7 @@ app.get("/proxy/stream", async (req, res) => {
       new URL(path, server).toString();
 
 
-    console.log("[PROXY] Target:", target);
+    debugLog("[PROXY] Target:", target);
 
 
     const headers = {
@@ -882,7 +902,7 @@ app.get("/proxy/stream", async (req, res) => {
       headers.Range =
         req.headers.range;
 
-      console.log(
+      debugLog(
         "[PROXY] Range:",
         req.headers.range
       );
@@ -903,7 +923,7 @@ app.get("/proxy/stream", async (req, res) => {
       );
 
 
-    console.log(
+    debugLog(
       "[PROXY] Resposta IPTV:",
       upstream.status,
       upstream.statusText
@@ -955,7 +975,7 @@ app.get("/proxy/stream", async (req, res) => {
 
     if (isM3U8) {
 
-      console.log(
+      debugLog(
         "[PROXY] Playlist HLS detectada"
       );
 
