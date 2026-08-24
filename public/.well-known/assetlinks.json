@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.onrender.streambox_backend_0rsa.twa",
+        "sha256_cert_fingerprints": ["38:6D:1F:43:B9:DB:77:0C:FF:E1:B7:7D:EE:A1:01:F8:31:C5:24:64:F5:5C:72:F7:7C:6F:EA:A3:67:28:B6:C2"]
+      }
+    }]
