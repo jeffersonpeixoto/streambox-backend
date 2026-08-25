@@ -371,6 +371,25 @@ body {
   overflow: hidden;
 }
 
+.hero-backdrop-image {
+  position: absolute;
+
+  inset: 0;
+
+  background-color: #050505;
+  background-position: center 20%;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  opacity: 0;
+
+  transition: opacity .6s ease;
+}
+
+.hero-backdrop-image.visible {
+  opacity: 1;
+}
+
 .hero-backdrop {
   position: absolute;
 
@@ -551,6 +570,51 @@ body {
 .hero-info:focus-visible {
   outline: 3px solid #fff;
   outline-offset: 3px;
+}
+
+.hero-dots {
+  display: flex;
+
+  gap: 8px;
+
+  margin-top: 28px;
+}
+
+.hero-dot {
+  width: 28px;
+  height: 4px;
+
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+
+  background: rgba(255,255,255,.3);
+
+  cursor: pointer;
+
+  transition: background .2s, transform .2s;
+}
+
+.hero-dot:hover {
+  background: rgba(255,255,255,.55);
+}
+
+.hero-dot.active {
+  background: #e50914;
+}
+
+.hero-dot:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.card-highlight {
+  animation: cardHighlightPulse 1.5s ease;
+}
+
+@keyframes cardHighlightPulse {
+  0%, 100% { box-shadow: none; }
+  25%, 75% { box-shadow: 0 0 0 3px #e50914; }
 }
 
 

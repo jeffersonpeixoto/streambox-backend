@@ -52,6 +52,14 @@ const CONFIG = {
   MAX_SERIES_CACHE: 30,
 
   /*
+   * Carrossel do hero (últimos lançamentos).
+   */
+
+  HERO_SLIDE_COUNT: 6,
+
+  HERO_SLIDE_INTERVAL: 7000,
+
+  /*
    * HLS otimizado para dispositivos de TV.
    */
 
@@ -121,6 +129,12 @@ const state = {
   searchOpen: false,
 
   searchTimer: null,
+
+  heroSlides: [],
+
+  heroIndex: 0,
+
+  heroTimer: null,
 
   hls: null,
 
@@ -898,6 +912,8 @@ async function loadCategory(
 
     renderItems();
 
+    buildHeroSlides();
+
     return;
 
   }
@@ -943,6 +959,8 @@ async function loadCategory(
 
 
     renderItems();
+
+    buildHeroSlides();
 
 
   } catch (error) {
@@ -1247,6 +1265,7 @@ function renderStandardItems() {
           return `
 
             <article
+              id="card-${esc(data.id)}"
               class="movie-card"
               tabindex="0"
               data-index="${index}"
@@ -4305,10 +4324,325 @@ function updateHeroForSection(
 
 
 /* =========================================================
+   HERO — CARROSSEL DE LANÇAMENTOS
+========================================================= */
+
+function buildHeroSlides() {
+
+  stopHeroTimer();
+
+
+  const source =
+    state.items || [];
+
+
+  if (
+    source.length === 0
+  ) {
+
+    state.heroSlides =
+      [];
+
+    renderHeroDots();
+
+    return;
+
+  }
+
+
+  /*
+   * Para filmes e séries, prioriza os
+   * itens mais recentes (campo "added"
+   * do Xtream, quando disponível).
+   */
+
+  let ordered =
+    source;
+
+
+  if (
+    state.section === "vod" ||
+    state.section === "series"
+  ) {
+
+    ordered =
+      [...source].sort(
+        (a, b) =>
+          Number(b.added || 0) -
+          Number(a.added || 0)
+      );
+
+  }
+
+
+  state.heroSlides =
+    ordered
+      .slice(
+        0,
+        CONFIG.HERO_SLIDE_COUNT
+      )
+      .map(
+        (item) => {
+
+          const data =
+            itemData(item);
+
+          return {
+
+            item,
+
+            title:
+              data.name,
+
+            image:
+              data.logo,
+
+            type:
+              data.type
+
+          };
+
+        }
+      );
+
+
+  state.heroIndex =
+    0;
+
+
+  renderHeroSlide();
+
+  renderHeroDots();
+
+  startHeroTimer();
+
+}
+
+
+function renderHeroSlide() {
+
+  const slide =
+    state.heroSlides[
+      state.heroIndex
+    ];
+
+
+  if (!slide)
+    return;
+
+
+  const title =
+    $("#heroTitle");
+
+  const meta =
+    $("#heroMeta");
+
+  const description =
+    $("#heroDescription");
+
+  const backdrop =
+    $("#heroBackdropImage");
+
+
+  const labels = {
+
+    live:
+      "CANAL EM DESTAQUE",
+
+    vod:
+      "LANÇAMENTO",
+
+    series:
+      "LANÇAMENTO"
+
+  };
+
+
+  if (title) {
+
+    title.textContent =
+      slide.title;
+
+  }
+
+
+  if (meta) {
+
+    meta.textContent =
+      labels[slide.type] ||
+      "";
+
+  }
+
+
+  if (description) {
+
+    description.textContent =
+      state.category?.category_name
+        ? `Em ${state.category.category_name}`
+        : "";
+
+  }
+
+
+  if (backdrop) {
+
+    if (slide.image) {
+
+      backdrop.style.backgroundImage =
+        `url("${slide.image}")`;
+
+      backdrop.classList.add(
+        "visible"
+      );
+
+    } else {
+
+      backdrop.classList.remove(
+        "visible"
+      );
+
+    }
+
+  }
+
+
+  renderHeroDots();
+
+}
+
+
+function renderHeroDots() {
+
+  const container =
+    $("#heroDots");
+
+
+  if (!container)
+    return;
+
+
+  if (
+    state.heroSlides.length <= 1
+  ) {
+
+    container.innerHTML =
+      "";
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    state.heroSlides
+      .map(
+        (_, index) =>
+          `<button
+            class="hero-dot${
+              index === state.heroIndex
+                ? " active"
+                : ""
+            }"
+            data-index="${index}"
+            aria-label="Slide ${index + 1}">
+          </button>`
+      )
+      .join("");
+
+
+  $$(".hero-dot")
+    .forEach(
+      (dot) => {
+
+        dot.addEventListener(
+          "click",
+          () => {
+
+            state.heroIndex =
+              Number(
+                dot.dataset.index
+              );
+
+            renderHeroSlide();
+
+            startHeroTimer();
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+function startHeroTimer() {
+
+  stopHeroTimer();
+
+
+  if (
+    state.heroSlides.length <= 1
+  )
+    return;
+
+
+  state.heroTimer =
+    setInterval(
+      () => {
+
+        state.heroIndex =
+          (state.heroIndex + 1) %
+          state.heroSlides.length;
+
+        renderHeroSlide();
+
+      },
+      CONFIG.HERO_SLIDE_INTERVAL
+    );
+
+}
+
+
+function stopHeroTimer() {
+
+  if (state.heroTimer) {
+
+    clearInterval(
+      state.heroTimer
+    );
+
+    state.heroTimer =
+      null;
+
+  }
+
+}
+
+
+/* =========================================================
    HERO PLAY
 ========================================================= */
 
 function heroPlay() {
+
+  const slide =
+    state.heroSlides[
+      state.heroIndex
+    ];
+
+
+  if (slide) {
+
+    playItem(
+      slide.item
+    );
+
+    return;
+
+  }
+
 
   if (
     state.items.length
@@ -4326,6 +4660,71 @@ function heroPlay() {
   alert(
     "Nenhum conteúdo carregado."
   );
+
+}
+
+
+function heroInfo() {
+
+  const slide =
+    state.heroSlides[
+      state.heroIndex
+    ];
+
+
+  if (!slide) {
+
+    heroPlay();
+
+    return;
+
+  }
+
+
+  const data =
+    itemData(
+      slide.item
+    );
+
+  const card =
+    document.getElementById(
+      `card-${data.id}`
+    );
+
+
+  if (card) {
+
+    card.scrollIntoView({
+
+      behavior: "smooth",
+
+      block: "center"
+
+    });
+
+
+    card.classList.add(
+      "card-highlight"
+    );
+
+
+    setTimeout(
+      () => {
+
+        card.classList.remove(
+          "card-highlight"
+        );
+
+      },
+      1500
+    );
+
+    return;
+
+  }
+
+
+  heroPlay();
 
 }
 
@@ -4577,6 +4976,13 @@ $("#heroPlay")
   ?.addEventListener(
     "click",
     heroPlay
+  );
+
+
+$("#heroInfo")
+  ?.addEventListener(
+    "click",
+    heroInfo
   );
 
 
