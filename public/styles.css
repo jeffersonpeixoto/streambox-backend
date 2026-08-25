@@ -432,11 +432,10 @@ body {
       rgba(255,255,255,.035) 1px,
       transparent 1px,
       transparent 64px
-    ),
-    #050505;
+    );
 
   background-position: center;
-  background-size: cover, cover, cover, cover, cover, cover, cover;
+  background-size: cover, cover, cover, cover, cover, cover;
   background-repeat: no-repeat;
 
   transform: scale(1.02);
