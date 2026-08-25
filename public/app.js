@@ -236,8 +236,23 @@ function clearAccount() {
 
 
 /* =========================================================
-   API
+   API / ANDROID TV
 ========================================================= */
+
+function nativeBackendUrl() {
+  try {
+    if (window.StreamBoxNative?.getBackendUrl) {
+      return String(window.StreamBoxNative.getBackendUrl() || "").replace(/\/+$/, "");
+    }
+  } catch {}
+  return "";
+}
+
+function backendPath(path) {
+  const base = nativeBackendUrl();
+  if (!base) return path;
+  return `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
 
 async function api(
   path,
@@ -246,7 +261,7 @@ async function api(
 
   const response =
     await fetch(
-      path,
+      backendPath(path),
       {
 
         method: "POST",
@@ -2939,7 +2954,7 @@ async function playEpisode(
 
 
   const proxy =
-    `/proxy/stream?server=${encodeURIComponent(
+    `${backendPath("/proxy/stream")}?server=${encodeURIComponent(
       state.server
     )}&path=${encodeURIComponent(
       data.path
@@ -3299,7 +3314,7 @@ async function playItem(
 
 
   const proxy =
-    `/proxy/stream?server=${encodeURIComponent(
+    `${backendPath("/proxy/stream")}?server=${encodeURIComponent(
       state.server
     )}&path=${encodeURIComponent(
       data.path
@@ -4443,6 +4458,38 @@ $("#close")
   );
 
 
+/*
+ * Sempre que a caixa de configuração
+ * fecha (por "Fechar", "Conectar" ou
+ * Voltar do controle), devolve o foco
+ * para o grid principal. Sem isso, o
+ * controle remoto fica sem navegar
+ * porque o foco não está mais em
+ * nenhum nav-btn/category-pill/movie-card.
+ */
+
+$("#settings")
+  ?.addEventListener(
+    "close",
+    () => {
+
+      requestAnimationFrame(
+        () => {
+
+          const target =
+            getCategories()[0] ||
+            getCards()[0] ||
+            getNav()[0];
+
+          target?.focus();
+
+        }
+      );
+
+    }
+  );
+
+
 /* =========================================================
    CONECTAR
 ========================================================= */
@@ -4695,6 +4742,89 @@ function moveVerticalCards(
 }
 
 
+function getFocusableFields(
+  container
+) {
+
+  if (!container)
+    return [];
+
+  const fields =
+    [
+      ...container.querySelectorAll(
+        'input, select, textarea, button, [tabindex]'
+      )
+    ];
+
+
+  return fields.filter(
+    (el) => {
+
+      if (el.disabled)
+        return false;
+
+      if (
+        el.tabIndex === -1
+      )
+        return false;
+
+      const rect =
+        el.getBoundingClientRect();
+
+      return (
+        rect.width > 0 ||
+        rect.height > 0
+      );
+
+    }
+  );
+
+}
+
+
+function moveFieldFocus(
+  container,
+  direction
+) {
+
+  const fields =
+    getFocusableFields(
+      container
+    );
+
+  const current =
+    document.activeElement;
+
+  const index =
+    fields.indexOf(
+      current
+    );
+
+
+  if (
+    index === -1
+  ) {
+
+    fields[0]?.focus();
+
+    return;
+
+  }
+
+
+  const next =
+    fields[index + direction];
+
+
+  if (next) {
+
+    next.focus();
+
+  }
+
+}
+
+
 /* =========================================================
    CONTROLE REMOTO / TECLADO
 ========================================================= */
@@ -4796,6 +4926,99 @@ document.addEventListener(
 
 
     /*
+     * DIÁLOGO / PAINEL ABERTO
+     * (Configurações, Busca)
+     *
+     * Dentro de um <dialog> ou do painel de
+     * busca, CIMA/BAIXO alternam entre os
+     * campos (input, select, button), já que
+     * o controle remoto não tem tecla Tab.
+     */
+
+    const openDialog =
+      document.querySelector(
+        "dialog[open]"
+      );
+
+    const searchPanel =
+      state.searchOpen
+        ? $("#searchPanel")
+        : null;
+
+    const activePanel =
+      openDialog ||
+      searchPanel;
+
+    if (
+      activePanel
+    ) {
+
+      if (
+        key === "Escape" ||
+        key === "Backspace" ||
+        key === "BrowserBack"
+      ) {
+
+        event.preventDefault();
+
+        if (openDialog) {
+          openDialog.close();
+        } else {
+          toggleSearch();
+        }
+
+        return;
+
+      }
+
+
+      if (
+        key === "ArrowDown" ||
+        key === "ArrowUp"
+      ) {
+
+        event.preventDefault();
+
+        moveFieldFocus(
+          activePanel,
+          key === "ArrowDown" ? 1 : -1
+        );
+
+        return;
+
+      }
+
+
+      if (
+        key === "Enter"
+      ) {
+
+        const activeTag =
+          document.activeElement
+            ?.tagName
+            ?.toLowerCase();
+
+        if (activeTag === "button") {
+          document.activeElement.click();
+        }
+
+        return;
+
+      }
+
+      /*
+       * ArrowLeft/ArrowRight e demais
+       * teclas seguem o comportamento
+       * padrão do campo focado (cursor
+       * de texto, abrir select, etc).
+       */
+
+      return;
+
+    }
+
+
+    /*
      * Inputs.
      */
 
@@ -4852,6 +5075,44 @@ document.addEventListener(
 
     const cards =
       getCards();
+
+
+    /*
+     * FOCO PERDIDO
+     *
+     * Se o elemento focado não é
+     * nenhum dos três grupos conhecidos
+     * (ex: body, ou um botão que acabou
+     * de sumir/fechar), manda o foco pro
+     * primeiro item disponível em vez de
+     * deixar o controle sem reação.
+     */
+
+    const currentIsKnown =
+      current?.classList?.contains("nav-btn") ||
+      current?.classList?.contains("category-pill") ||
+      current?.classList?.contains("movie-card");
+
+    if (
+      !currentIsKnown &&
+      [
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight"
+      ].includes(key)
+    ) {
+
+      const fallback =
+        categories[0] ||
+        cards[0] ||
+        nav[0];
+
+      fallback?.focus();
+
+      return;
+
+    }
 
 
     /*
