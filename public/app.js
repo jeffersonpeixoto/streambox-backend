@@ -4774,6 +4774,27 @@ function toggleSearch() {
 
     renderItems();
 
+
+    /*
+     * Devolve o foco pro grid principal.
+     * Sem isso, o campo de busca (agora
+     * invisível, mas ainda focado) deixa
+     * o controle remoto sem reação.
+     */
+
+    requestAnimationFrame(
+      () => {
+
+        const target =
+          getCategories()[0] ||
+          getCards()[0] ||
+          getNav()[0];
+
+        target?.focus();
+
+      }
+    );
+
   }
 
 }
