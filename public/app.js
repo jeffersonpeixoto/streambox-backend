@@ -5234,6 +5234,52 @@ function getNav() {
 }
 
 
+function isFirstColumn(
+  card,
+  cards
+) {
+
+  if (
+    !card ||
+    cards.length === 0
+  )
+    return true;
+
+
+  const rect =
+    card.getBoundingClientRect();
+
+  const firstRect =
+    cards[0].getBoundingClientRect();
+
+
+  return (
+    Math.abs(
+      rect.left -
+      firstRect.left
+    ) < 20
+  );
+
+}
+
+
+function getActiveCategory(
+  categories
+) {
+
+  return (
+    categories.find(
+      (el) =>
+        el.classList.contains(
+          "active"
+        )
+    ) ||
+    categories[0]
+  );
+
+}
+
+
 function moveHorizontal(
   elements,
   direction
@@ -5363,8 +5409,9 @@ function moveVerticalCards(
     direction < 0
   ) {
 
-    getCategories()[0]
-      ?.focus();
+    getActiveCategory(
+      getCategories()
+    )?.focus();
 
   }
 
@@ -5830,10 +5877,8 @@ document.addEventListener(
           )
       ) {
 
-        moveHorizontal(
-          categories,
-          1
-        );
+        cards[0]
+          ?.focus();
 
         return;
 
@@ -5888,26 +5933,25 @@ document.addEventListener(
       if (
         current?.classList
           .contains(
-            "category-pill"
-          )
-      ) {
-
-        moveHorizontal(
-          categories,
-          -1
-        );
-
-        return;
-
-      }
-
-
-      if (
-        current?.classList
-          .contains(
             "movie-card"
           )
       ) {
+
+        if (
+          isFirstColumn(
+            current,
+            cards
+          )
+        ) {
+
+          getActiveCategory(
+            categories
+          )?.focus();
+
+          return;
+
+        }
+
 
         moveHorizontal(
           cards,
@@ -5952,8 +5996,10 @@ document.addEventListener(
           )
       ) {
 
-        cards[0]
-          ?.focus();
+        moveHorizontal(
+          categories,
+          1
+        );
 
         return;
 
@@ -6010,8 +6056,27 @@ document.addEventListener(
           )
       ) {
 
-        nav[0]
-          ?.focus();
+        const index =
+          categories.indexOf(
+            current
+          );
+
+
+        if (
+          index <= 0
+        ) {
+
+          nav[0]
+            ?.focus();
+
+        } else {
+
+          moveHorizontal(
+            categories,
+            -1
+          );
+
+        }
 
         return;
 
@@ -6021,6 +6086,38 @@ document.addEventListener(
 
   }
 );
+
+
+/* =========================================================
+   SIDEBAR DE CATEGORIAS (RETRÁTIL)
+========================================================= */
+
+$("#categoriesSection")
+  ?.addEventListener(
+    "focusin",
+    () => {
+
+      $("#categoriesSection")
+        ?.classList.add(
+          "expanded"
+        );
+
+    }
+  );
+
+
+$("#categoriesSection")
+  ?.addEventListener(
+    "focusout",
+    () => {
+
+      $("#categoriesSection")
+        ?.classList.remove(
+          "expanded"
+        );
+
+    }
+  );
 
 
 /* =========================================================

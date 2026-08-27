@@ -631,6 +631,18 @@ main {
   padding-bottom: 80px;
 }
 
+.content-layout {
+  display: flex;
+
+  align-items: flex-start;
+}
+
+.main-col {
+  flex: 1;
+
+  min-width: 0;
+}
+
 .section-heading {
   display: flex;
 
@@ -639,7 +651,7 @@ main {
   gap: 15px;
 
   padding:
-    0 55px;
+    0 30px;
 
   margin-bottom: 22px;
 }
@@ -658,27 +670,73 @@ main {
 
 
 /* =========================================================
-   CATEGORIES
+   CATEGORIES (SIDEBAR RETRÁTIL)
 ========================================================= */
 
 .category-section {
-  padding:
-    0 55px;
+  flex: 0 0 auto;
 
-  margin-bottom: 32px;
+  width: 76px;
 
-  overflow-x: auto;
+  padding: 4px 10px;
+
+  margin: 0 6px 0 0;
+
+  overflow: hidden;
+
+  position: sticky;
+
+  top: 20px;
+
+  max-height: calc(100vh - 40px);
+
+  overflow-y: auto;
+
+  transition: width .25s ease;
+}
+
+.category-section.expanded {
+  width: 250px;
+}
+
+.cat-title {
+  color: #888;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: .08em;
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+
+  margin-bottom: 12px;
+
+  opacity: 0;
+
+  transition: opacity .2s ease .1s;
+}
+
+.category-section.expanded .cat-title {
+  opacity: 1;
 }
 
 .category-list {
   display: flex;
+  flex-direction: column;
 
-  gap: 10px;
+  gap: 8px;
 
-  width: max-content;
+  width: 100%;
 }
 
 .category-pill {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+
   border: 1px solid var(--border);
 
   background: rgba(255,255,255,.06);
@@ -686,25 +744,38 @@ main {
   color: #ddd;
 
   padding:
-    10px 16px;
+    10px 14px;
 
-  border-radius: 22px;
+  border-radius: 8px;
 
   font-size: 13px;
   font-weight: 700;
 
   white-space: nowrap;
 
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  text-align: left;
+
   cursor: pointer;
 
   transition:
     background .2s,
-    color .2s,
-    transform .2s;
+    color .2s;
 }
 
 .category-pill span {
   margin-right: 5px;
+}
+
+.category-pill.active {
+  background: #e50914;
+
+  border-color: #e50914;
+
+  color: #fff;
 }
 
 .category-pill:hover {
@@ -716,9 +787,7 @@ main {
 .category-pill:focus-visible {
   outline: 3px solid #fff;
 
-  outline-offset: 3px;
-
-  transform: scale(1.05);
+  outline-offset: 2px;
 }
 
 
@@ -802,9 +871,9 @@ main {
 .movie-card {
   position: relative;
 
-  flex: 0 0 180px;
+  flex: 0 0 130px;
 
-  width: 180px;
+  width: 130px;
 
   cursor: pointer;
 
@@ -963,13 +1032,13 @@ main {
   grid-template-columns:
     repeat(
       auto-fill,
-      minmax(180px, 1fr)
+      minmax(130px, 1fr)
     );
 
-  gap: 30px 14px;
+  gap: 24px 12px;
 
   padding:
-    0 55px;
+    0 30px;
 }
 
 .movie-grid
@@ -1250,11 +1319,6 @@ dialog p {
   }
 
   .row-track {
-    padding-left: 30px;
-    padding-right: 30px;
-  }
-
-  .category-section {
     padding-left: 30px;
     padding-right: 30px;
   }

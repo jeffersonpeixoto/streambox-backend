@@ -355,92 +355,106 @@
 
   <main id="content">
 
-    <!-- =======================================================
-         TÍTULO DA SEÇÃO
-    ======================================================= -->
-
     <div
-      id="heading"
-      class="section-heading">
+      id="contentLayout"
+      class="content-layout">
 
-      <h1 id="title">
-        TV AO VIVO
-      </h1>
+      <!-- =====================================================
+           CATEGORIAS (SIDEBAR)
+      ===================================================== -->
 
-      <span id="count">
-      </span>
+      <section
+        id="categoriesSection"
+        class="category-section">
+
+        <div
+          id="categories"
+          class="category-list">
+        </div>
+
+      </section>
+
+
+
+      <!-- =====================================================
+           COLUNA PRINCIPAL
+      ===================================================== -->
+
+      <div class="main-col">
+
+        <!-- ===================================================
+             TÍTULO DA SEÇÃO
+        =================================================== -->
+
+        <div
+          id="heading"
+          class="section-heading">
+
+          <h1 id="title">
+            TV AO VIVO
+          </h1>
+
+          <span id="count">
+          </span>
+
+        </div>
+
+
+
+        <!-- ===================================================
+             CARROSSÉIS
+        =================================================== -->
+
+        <section
+          id="rows"
+          class="rows">
+        </section>
+
+
+
+        <!-- ===================================================
+             RESULTADOS
+        =================================================== -->
+
+        <section
+          id="searchResults"
+          class="search-results">
+
+          <div
+            class="row-title">
+
+            <h2>
+              Conteúdo
+            </h2>
+
+          </div>
+
+
+          <div
+            id="items"
+            class="movie-grid">
+          </div>
+
+
+          <div
+            id="pagination"
+            class="pagination">
+          </div>
+
+
+          <div
+            id="empty"
+            class="empty hidden">
+
+            Nenhum conteúdo encontrado.
+
+          </div>
+
+        </section>
+
+      </div>
 
     </div>
-
-
-
-    <!-- =======================================================
-         CATEGORIAS
-    ======================================================= -->
-
-    <section
-      id="categoriesSection"
-      class="category-section">
-
-      <div
-        id="categories"
-        class="category-list">
-      </div>
-
-    </section>
-
-
-
-    <!-- =======================================================
-         CARROSSÉIS
-    ======================================================= -->
-
-    <section
-      id="rows"
-      class="rows">
-    </section>
-
-
-
-    <!-- =======================================================
-         RESULTADOS
-    ======================================================= -->
-
-    <section
-      id="searchResults"
-      class="search-results">
-
-      <div
-        class="row-title">
-
-        <h2>
-          Conteúdo
-        </h2>
-
-      </div>
-
-
-      <div
-        id="items"
-        class="movie-grid">
-      </div>
-
-
-      <div
-        id="pagination"
-        class="pagination">
-      </div>
-
-
-      <div
-        id="empty"
-        class="empty hidden">
-
-        Nenhum conteúdo encontrado.
-
-      </div>
-
-    </section>
 
   </main>
 
