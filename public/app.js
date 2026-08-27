@@ -3220,51 +3220,24 @@ async function openPlayer() {
 
 
   /*
-   * Fullscreen real.
+   * Tela cheia via CSS.
+   *
+   * A Activity Android já roda em modo
+   * imersivo (sem barra de status/nav),
+   * então usamos só o CSS pra cobrir a
+   * tela inteira. A API de Fullscreen
+   * do navegador (requestFullscreen) foi
+   * removida de propósito: dentro do
+   * WebView ela intercepta o botão
+   * Voltar do controle (a primeira
+   * apertada só sai do "fullscreen do
+   * navegador", sem fechar o player),
+   * deixando a navegação travada.
    */
 
-  try {
-
-    if (
-      !document.fullscreenElement &&
-      player.requestFullscreen
-    ) {
-
-      await player.requestFullscreen();
-
-    } else if (
-      !document.fullscreenElement &&
-      video.webkitEnterFullscreen
-    ) {
-
-      video.webkitEnterFullscreen();
-
-    }
-
-  } catch (error) {
-
-    console.warn(
-      "[PLAYER] Fullscreen indisponível:",
-      error
-    );
-
-
-    player.classList.add(
-      "fullscreen-fallback"
-    );
-
-  }
-
-
-  if (
-    !document.fullscreenElement
-  ) {
-
-    player.classList.add(
-      "fullscreen-fallback"
-    );
-
-  }
+  player.classList.add(
+    "fullscreen-fallback"
+  );
 
 }
 
@@ -3294,26 +3267,6 @@ async function closePlayer() {
 
   state.playerOpen =
     false;
-
-
-  try {
-
-    if (
-      document.fullscreenElement
-    ) {
-
-      await document.exitFullscreen();
-
-    }
-
-  } catch (error) {
-
-    console.warn(
-      "[PLAYER] Erro fullscreen:",
-      error
-    );
-
-  }
 
 
   player.classList.remove(
@@ -4081,41 +4034,16 @@ async function toggleFullscreen() {
     return;
 
 
-  try {
+  /*
+   * Só alterna o CSS — sem usar a API
+   * de Fullscreen do navegador (ver
+   * nota em openPlayer sobre o
+   * conflito com o botão Voltar).
+   */
 
-    if (
-      document.fullscreenElement
-    ) {
-
-      await document.exitFullscreen();
-
-    } else if (
-      player.requestFullscreen
-    ) {
-
-      await player.requestFullscreen();
-
-    } else {
-
-      player.classList.toggle(
-        "fullscreen-fallback"
-      );
-
-    }
-
-  } catch (error) {
-
-    console.warn(
-      "[PLAYER] Fullscreen:",
-      error
-    );
-
-
-    player.classList.toggle(
-      "fullscreen-fallback"
-    );
-
-  }
+  player.classList.toggle(
+    "fullscreen-fallback"
+  );
 
 
   showPlayerControls();
@@ -4316,43 +4244,6 @@ $("#video")
 
     }
   );
-
-
-/* =========================================================
-   FULLSCREEN CHANGE
-========================================================= */
-
-document.addEventListener(
-  "fullscreenchange",
-  () => {
-
-    const player =
-      $("#player");
-
-
-    if (!player)
-      return;
-
-
-    if (
-      document.fullscreenElement ===
-      player
-    ) {
-
-      player.classList.add(
-        "controls-visible"
-      );
-
-    } else if (
-      state.playerOpen
-    ) {
-
-      closePlayer();
-
-    }
-
-  }
-);
 
 
 /* =========================================================
