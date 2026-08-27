@@ -839,6 +839,37 @@ main {
     0 8px 20px rgba(0,0,0,.45);
 }
 
+.rating-badge {
+  position: absolute;
+
+  top: 8px;
+  left: 8px;
+
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  gap: 3px;
+
+  padding: 3px 7px;
+
+  border-radius: 4px;
+
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(2px);
+
+  color: #f5c518;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  letter-spacing: .2px;
+
+  pointer-events: none;
+}
+
 .movie-poster img {
   display: block;
 

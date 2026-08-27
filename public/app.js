@@ -136,6 +136,10 @@ const state = {
 
   heroTimer: null,
 
+  allItemsCache: {},
+
+  allItemsLoading: {},
+
   hls: null,
 
   connected: false,
@@ -481,6 +485,10 @@ async function connect(
     state.cache.clear();
 
     state.seriesCache.clear();
+
+    state.allItemsCache = {};
+
+    state.allItemsLoading = {};
 
     state.connected =
       true;
@@ -994,6 +1002,59 @@ async function loadCategory(
 
 
 /* =========================================================
+   NOTA (IMDB/TMDB)
+========================================================= */
+
+function itemRating(item) {
+
+  const raw =
+    item.rating ??
+    item.rating_5based ??
+    null;
+
+
+  if (
+    raw === null ||
+    raw === undefined ||
+    raw === ""
+  )
+    return null;
+
+
+  let value =
+    Number(raw);
+
+
+  if (
+    !Number.isFinite(value) ||
+    value <= 0
+  )
+    return null;
+
+
+  /*
+   * "rating_5based" vem numa escala de
+   * 0 a 5 — converte pra escala de 10,
+   * igual à do "rating" normal.
+   */
+
+  if (
+    item.rating === undefined &&
+    item.rating_5based !== undefined
+  ) {
+
+    value =
+      value * 2;
+
+  }
+
+
+  return value.toFixed(1);
+
+}
+
+
+/* =========================================================
    ITEM DATA
 ========================================================= */
 
@@ -1068,6 +1129,9 @@ function itemData(item) {
           item.stream_id
         )}.${extension}`,
 
+      rating:
+        itemRating(item),
+
       type:
         "vod"
 
@@ -1094,6 +1158,9 @@ function itemData(item) {
 
     path:
       "",
+
+    rating:
+      itemRating(item),
 
     type:
       "series"
@@ -1169,6 +1236,9 @@ function renderStandardItems() {
   let items =
     state.items;
 
+  let searchTotal =
+    null;
+
 
   /*
    * Busca somente quando necessária.
@@ -1176,8 +1246,19 @@ function renderStandardItems() {
 
   if (search) {
 
+    const globalItems =
+      (state.section === "vod" ||
+        state.section === "series") &&
+      state.allItemsCache[state.section];
+
+
+    const pool =
+      globalItems ||
+      state.items;
+
+
     items =
-      state.items.filter(
+      pool.filter(
         (item) =>
           String(
             item.name || ""
@@ -1185,6 +1266,46 @@ function renderStandardItems() {
             .toLowerCase()
             .includes(search)
       );
+
+    searchTotal =
+      items.length;
+
+
+    /*
+     * Ainda não carregou o catálogo
+     * completo dessa seção? Dispara em
+     * segundo plano e re-renderiza
+     * quando estiver pronto, sem travar
+     * a busca na categoria atual.
+     */
+
+    if (
+      !globalItems &&
+      (state.section === "vod" ||
+        state.section === "series")
+    ) {
+
+      loadAllSectionItems(
+        state.section
+      ).then(
+        () => {
+
+          if (
+            String(
+              $("#search")?.value || ""
+            )
+              .toLowerCase()
+              .trim() === search
+          ) {
+
+            renderItems();
+
+          }
+
+        }
+      );
+
+    }
 
   }
 
@@ -1204,22 +1325,25 @@ function renderStandardItems() {
 
     const total =
       search
-        ? state.items.filter(
-            (item) =>
-              String(
-                item.name || ""
-              )
-                .toLowerCase()
-                .includes(search)
-          ).length
+        ? searchTotal
         : state.items.length;
+
+
+    const searching =
+      search &&
+      (state.section === "vod" ||
+        state.section === "series") &&
+      !state.allItemsCache[state.section];
 
 
     $("#count").textContent =
       `${Math.min(
         total,
         CONFIG.MAX_CARDS
-      )} de ${total}`;
+      )} de ${total}` +
+      (searching
+        ? " (buscando em todas as categorias…)"
+        : "");
 
   }
 
@@ -1274,6 +1398,18 @@ function renderStandardItems() {
               <div
                 class="movie-poster"
               >
+
+                ${
+                  data.rating
+
+                    ? `
+                      <span class="rating-badge">
+                        ★ ${esc(data.rating)}
+                      </span>
+                    `
+
+                    : ""
+                }
 
                 ${
                   data.logo
@@ -4324,6 +4460,177 @@ function updateHeroForSection(
 
 
 /* =========================================================
+   BUSCA GLOBAL (TODAS AS CATEGORIAS)
+========================================================= */
+
+function itemUid(item) {
+
+  return (
+    item.stream_id ??
+    item.series_id ??
+    item.num ??
+    item.name
+  );
+
+}
+
+
+async function loadAllSectionItems(
+  section
+) {
+
+  /*
+   * Só faz sentido pra Filmes e Séries.
+   * TV ao vivo tem categorias demais
+   * (regionais, etc) e a categoria
+   * "principal" já cobre os canais
+   * relevantes.
+   */
+
+  if (
+    section !== "vod" &&
+    section !== "series"
+  )
+    return state.items;
+
+
+  if (
+    state.allItemsCache[section]
+  ) {
+
+    return state.allItemsCache[section];
+
+  }
+
+
+  if (
+    state.allItemsLoading[section]
+  ) {
+
+    return await state.allItemsLoading[section];
+
+  }
+
+
+  const categories =
+    state.categories[section] ||
+    [];
+
+
+  const promise =
+    (async () => {
+
+      const lists =
+        await Promise.all(
+          categories.map(
+            async (cat) => {
+
+              const key =
+                `${section}:${cat.category_id}`;
+
+
+              if (
+                state.cache.has(key)
+              ) {
+
+                return state.cache.get(
+                  key
+                );
+
+              }
+
+
+              try {
+
+                const data =
+                  await api(
+                    "/api/items",
+                    {
+
+                      ...getCredentials(),
+
+                      type:
+                        section,
+
+                      categoryId:
+                        cat.category_id
+
+                    }
+                  );
+
+                const list =
+                  Array.isArray(data)
+                    ? data
+                    : [];
+
+                state.cache.set(
+                  key,
+                  list
+                );
+
+                return list;
+
+              } catch (error) {
+
+                console.error(
+                  "[BUSCA GLOBAL]",
+                  error
+                );
+
+                return [];
+
+              }
+
+            }
+          )
+        );
+
+
+      const merged =
+        lists.flat();
+
+      const seen =
+        new Set();
+
+      const deduped =
+        merged.filter(
+          (item) => {
+
+            const id =
+              itemUid(item);
+
+            if (seen.has(id))
+              return false;
+
+            seen.add(id);
+
+            return true;
+
+          }
+        );
+
+
+      state.allItemsCache[section] =
+        deduped;
+
+      state.allItemsLoading[section] =
+        null;
+
+      return deduped;
+
+    })();
+
+
+  state.allItemsLoading[section] =
+    promise;
+
+
+  return await promise;
+
+}
+
+
+/* =========================================================
    HERO — CARROSSEL DE LANÇAMENTOS
 ========================================================= */
 
@@ -4954,6 +5261,10 @@ $("#forget")
       state.cache.clear();
 
       state.seriesCache.clear();
+
+      state.allItemsCache = {};
+
+      state.allItemsLoading = {};
 
 
       if ($("#server")) {
